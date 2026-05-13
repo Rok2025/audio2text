@@ -40,11 +40,18 @@ bash scripts/download_models.sh
 docker compose up -d --build
 ```
 
-脚本默认从 `models-v1` release 下载 `audio2text-models-v1.tar.gz`，并解压出：
+脚本默认从 `models-v1` release 下载 `audio2text-models-v1.tar.gz`，同时下载 `.sha256`
+文件进行校验，并解压出：
 
 ```text
 models/paraformer-zh/
 models/fsmn-vad/
+```
+
+模型包地址：
+
+```text
+https://github.com/Rok2025/audio2text/releases/download/models-v1/audio2text-models-v1.tar.gz
 ```
 
 如果需要改成内网模型地址，可覆盖环境变量：
