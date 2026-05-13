@@ -27,4 +27,8 @@ The current Paraformer model file is about 944 MB, which is too large for a regu
 - GitHub Release asset
 - Git LFS, only if the team accepts LFS quota and bandwidth management
 
-Before running Docker on a fresh clone, copy the model directories into `./models` or mount them into the container.
+Before running Docker on a fresh clone, copy the model directories into `./models`, mount them into the container, or run:
+
+```bash
+bash scripts/download_models.sh
+```

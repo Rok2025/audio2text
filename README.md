@@ -31,6 +31,29 @@ GitHub 仓库只保存代码、配置、部署脚本和文档，不提交以下�
 
 从 GitHub 克隆后，需要先把模型文件复制或挂载到 `./models`，再启动服务。
 
+最省事的方式是使用本仓库的 GitHub Release 模型包：
+
+```bash
+git clone https://github.com/Rok2025/audio2text.git
+cd audio2text
+bash scripts/download_models.sh
+docker compose up -d --build
+```
+
+脚本默认从 `models-v1` release 下载 `audio2text-models-v1.tar.gz`，并解压出：
+
+```text
+models/paraformer-zh/
+models/fsmn-vad/
+```
+
+如果需要改成内网模型地址，可覆盖环境变量：
+
+```bash
+AUDIO2TEXT_MODEL_URL="http://内网文件服务器/audio2text-models-v1.tar.gz" \
+  bash scripts/download_models.sh
+```
+
 ## 本地安装
 
 建议使用 Python 3.11。不要直接依赖系统里的 `python` 命令，先初始化本项目自己的 `.venv`：
