@@ -1,0 +1,12 @@
+.venv
+.git
+.github
+__pycache__
+*.pyc
+.DS_Store
+*.tar.gz
+*.zip
+storage/input/*
+storage/wav/*
+storage/result/*
+tests

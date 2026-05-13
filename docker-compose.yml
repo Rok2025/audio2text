@@ -1,0 +1,11 @@
+services:
+  audio2text:
+    build: .
+    container_name: audio2text
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./storage:/app/storage
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped

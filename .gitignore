@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.tar.gz
+*.zip
+*.log
+storage/input/*
+storage/wav/*
+storage/result/*
+models/*
+!models/README.md

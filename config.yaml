@@ -1,0 +1,11 @@
+asr:
+  model_path: ./models/paraformer-zh
+  vad_model_path: ./models/fsmn-vad
+  device: cpu
+  batch_size_s: 60
+  gap_threshold_ms: 600
+
+storage:
+  input_dir: ./storage/input
+  wav_dir: ./storage/wav
+  result_dir: ./storage/result
