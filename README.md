@@ -205,6 +205,8 @@ find /opt -name docker-compose.yml
 
 ### 3. 构建并启动服务
 
+Docker 镜像构建时默认使用阿里云 Debian 镜像源，适合中国国内服务器。
+
 ```bash
 docker compose up -d --build
 ```
