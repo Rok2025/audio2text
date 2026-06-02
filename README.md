@@ -1,17 +1,22 @@
 # audio2text
 
-一个可独立部署的本地音频转文本服务，使用 FunASR Paraformer 中文模型和 FSMN-VAD。
+一个可独立部署的本地音频/视频转文本服务，使用 FunASR Paraformer 中文模型和 FSMN-VAD。
+视频文件会先通过 `ffmpeg` 提取音轨，再进入同一套本地 ASR 转写流程。
 
 ## 目录说明
 
 ```text
 app/                 服务代码
 models/              本地模型目录，GitHub 仓库只保留说明，不提交模型大文件
-storage/input/       上传的原始音频
+storage/input/       上传的原始音频或视频
 storage/wav/         转码后的 16k 单声道 WAV
-storage/result/      识别 JSON、断句 JSON、断句 TXT
+storage/result/      识别 JSON、断句 JSON、断句 TXT、SRT、VTT
+storage/jobs/        异步任务状态 JSON
+storage/logs/        服务运行日志
+storage/records/     调用审计记录
 scripts/             命令行工具
-config.yaml          模型、存储、断句阈值配置
+docs/                接口手册和服务管理方案
+config.yaml          模型、存储、断句阈值、运行目录配置
 ```
 
 ## GitHub 大文件策略
@@ -19,7 +24,7 @@ config.yaml          模型、存储、断句阈值配置
 GitHub 仓库只保存代码、配置、部署脚本和文档，不提交以下内容：
 
 - `.venv/`：Linux/macOS 环境不可通用，且包含大量第三方依赖文件。
-- `storage/` 下的运行产物：上传音频、转码 WAV、识别结果均为运行时数据。
+- `storage/` 下的运行产物：上传媒体、转码 WAV、识别结果、任务状态、日志、调用记录均为运行时数据。
 - `models/` 下的模型大文件：例如 `models/paraformer-zh/model.pt` 约 944 MB。
 
 模型交付建议单独处理：
@@ -98,9 +103,61 @@ bash scripts/run_server.sh
 
 ```bash
 curl -F "file=@/path/to/audio.m4a" "http://127.0.0.1:8000/api/transcribe?thresholdMs=600"
+curl -F "file=@/path/to/video.mp4" "http://127.0.0.1:8000/api/transcribe?thresholdMs=600"
 ```
 
 返回包含完整文本、按时间间隔切分的 `segments`，以及生成的结果文件路径。
+
+更完整的接口说明见：[docs/API_MANUAL.md](docs/API_MANUAL.md)。
+
+服务日志与调用记录方案见：[docs/SERVICE_MANAGEMENT_PLAN.md](docs/SERVICE_MANAGEMENT_PLAN.md)。
+
+文档索引见：[docs/README.md](docs/README.md)。
+
+当前 HTTP 接口能力：
+
+- 支持音频：`.aac`、`.flac`、`.m4a`、`.mp3`、`.ogg`、`.opus`、`.wav`
+- 支持视频：`.avi`、`.m4v`、`.mkv`、`.mov`、`.mp4`、`.webm`
+- 支持返回：`json`、`text`、`srt`、`vtt`
+- 支持同步转写和异步任务
+- 支持调用记录查询和 JSON Lines 服务日志
+
+同步接口支持指定返回格式：
+
+```bash
+curl -F "file=@/path/to/audio.m4a" \
+  "http://127.0.0.1:8000/api/transcribe?thresholdMs=600&format=json"
+
+curl -F "file=@/path/to/video.mp4" \
+  "http://127.0.0.1:8000/api/transcribe?format=srt"
+```
+
+可用格式：
+
+- `json`：完整结构化结果，默认格式。
+- `text`：只返回完整文本。
+- `srt`：返回 SRT 字幕。
+- `vtt`：返回 WebVTT 字幕。
+
+也可以使用异步任务接口，适合较长音频或视频：
+
+```bash
+curl -F "file=@/path/to/audio.m4a" "http://127.0.0.1:8000/api/jobs?thresholdMs=600"
+curl -F "file=@/path/to/video.mp4" "http://127.0.0.1:8000/api/jobs?thresholdMs=600"
+
+curl "http://127.0.0.1:8000/api/jobs/{taskId}"
+curl "http://127.0.0.1:8000/api/jobs/{taskId}/result"
+curl "http://127.0.0.1:8000/api/jobs/{taskId}/result?format=vtt"
+curl "http://127.0.0.1:8000/api/jobs/{taskId}/files/srt"
+```
+
+辅助接口：
+
+```bash
+curl http://127.0.0.1:8000/ready
+curl http://127.0.0.1:8000/api/models
+curl "http://127.0.0.1:8000/api/records?limit=50"
+```
 
 ## Docker 部署
 
@@ -115,6 +172,9 @@ COPYFILE_DISABLE=1 tar \
   --exclude='audio2text/storage/input/*' \
   --exclude='audio2text/storage/wav/*' \
   --exclude='audio2text/storage/result/*' \
+  --exclude='audio2text/storage/jobs/*' \
+  --exclude='audio2text/storage/logs/*' \
+  --exclude='audio2text/storage/records/*' \
   -czf audio2text.tar.gz audio2text
 ```
 
@@ -173,6 +233,7 @@ curl http://127.0.0.1:8000/health
 
 ```bash
 curl -F "file=@/path/to/test.m4a" "http://127.0.0.1:8000/api/transcribe?thresholdMs=600"
+curl -F "file=@/path/to/test.mp4" "http://127.0.0.1:8000/api/jobs?thresholdMs=600"
 ```
 
 私有化交付时复制整个 `audio2text` 文件夹到服务器即可。不要复制 macOS 的 `.venv` 到 Linux；

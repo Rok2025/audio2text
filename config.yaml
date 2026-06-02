@@ -9,3 +9,6 @@ storage:
   input_dir: ./storage/input
   wav_dir: ./storage/wav
   result_dir: ./storage/result
+  job_dir: ./storage/jobs
+  log_dir: ./storage/logs
+  record_dir: ./storage/records

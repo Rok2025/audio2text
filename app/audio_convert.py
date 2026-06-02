@@ -31,5 +31,13 @@ def convert_to_wav(source: str | Path, target: str | Path) -> Path:
         "pcm_s16le",
         str(target_path),
     ]
-    subprocess.run(command, check=True, capture_output=True, text=True)
+    try:
+        subprocess.run(command, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as exc:
+        stderr = exc.stderr or ""
+        if "Output file #0 does not contain any stream" in stderr or "Stream map" in stderr:
+            raise RuntimeError(
+                "Failed to extract audio from media file. The file may not contain an audio track."
+            ) from exc
+        raise RuntimeError(f"Failed to convert media to wav: {stderr.strip() or exc}") from exc
     return target_path

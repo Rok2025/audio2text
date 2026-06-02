@@ -32,6 +32,9 @@ storage:
             self.assertEqual(config.asr.vad_model_path, (root / "models/fsmn-vad").resolve())
             self.assertEqual(config.asr.gap_threshold_ms, 700)
             self.assertEqual(config.storage.result_dir, (root / "storage/result").resolve())
+            self.assertEqual(config.storage.job_dir, (root / "storage/jobs").resolve())
+            self.assertEqual(config.storage.log_dir, (root / "storage/logs").resolve())
+            self.assertEqual(config.storage.record_dir, (root / "storage/records").resolve())
 
 
 if __name__ == "__main__":

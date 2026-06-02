@@ -21,6 +21,9 @@ class StorageConfig:
     input_dir: Path
     wav_dir: Path
     result_dir: Path
+    job_dir: Path
+    log_dir: Path
+    record_dir: Path
 
 
 @dataclass(frozen=True)
@@ -64,10 +67,16 @@ def load_config(config_path: str | Path = "config.yaml") -> AppConfig:
             input_dir=_resolve_path(root_dir, storage.get("input_dir", "./storage/input")),
             wav_dir=_resolve_path(root_dir, storage.get("wav_dir", "./storage/wav")),
             result_dir=_resolve_path(root_dir, storage.get("result_dir", "./storage/result")),
+            job_dir=_resolve_path(root_dir, storage.get("job_dir", "./storage/jobs")),
+            log_dir=_resolve_path(root_dir, storage.get("log_dir", "./storage/logs")),
+            record_dir=_resolve_path(root_dir, storage.get("record_dir", "./storage/records")),
         ),
     )
 
     app_config.storage.input_dir.mkdir(parents=True, exist_ok=True)
     app_config.storage.wav_dir.mkdir(parents=True, exist_ok=True)
     app_config.storage.result_dir.mkdir(parents=True, exist_ok=True)
+    app_config.storage.job_dir.mkdir(parents=True, exist_ok=True)
+    app_config.storage.log_dir.mkdir(parents=True, exist_ok=True)
+    app_config.storage.record_dir.mkdir(parents=True, exist_ok=True)
     return app_config
