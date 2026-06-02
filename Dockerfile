@@ -2,7 +2,11 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ \
+    PIP_TRUSTED_HOST=mirrors.aliyun.com \
+    PIP_DEFAULT_TIMEOUT=120 \
+    PIP_RETRIES=5
 
 WORKDIR /app
 

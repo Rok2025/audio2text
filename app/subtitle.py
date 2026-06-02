@@ -4,6 +4,37 @@ from typing import Any
 
 from app.segment_by_gap import format_time
 
+TERMINAL_PUNCTUATION = "。！？!?；;：:"
+
+
+def ensure_sentence_punctuation(text: str) -> str:
+    stripped = text.strip()
+    if not stripped:
+        return stripped
+    if stripped[-1] in TERMINAL_PUNCTUATION:
+        return stripped
+    return stripped + "。"
+
+
+def punctuate_segments(segments: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    output = []
+    for segment in segments:
+        item = dict(segment)
+        item["text"] = ensure_sentence_punctuation(str(item.get("text", "")))
+        output.append(item)
+    return output
+
+
+def render_punctuated_text(segments: list[dict[str, Any]]) -> str:
+    return "".join(str(segment.get("text", "")) for segment in segments)
+
+
+def render_segments_text(segments: list[dict[str, Any]]) -> str:
+    lines = []
+    for segment in segments:
+        lines.append(f"[{segment['start']}-{segment['end']}] {segment.get('text', '')}")
+    return "\n".join(lines)
+
 
 def format_srt_time(ms: int) -> str:
     return format_time(ms).replace(".", ",")

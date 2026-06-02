@@ -11,8 +11,15 @@ from typing import Any
 from app.audio_convert import convert_to_wav
 from app.config import AppConfig
 from app.media import MediaType, detect_media_type
-from app.segment_by_gap import render_segments_text, segment_funasr_result
-from app.subtitle import enrich_segments, render_srt, render_vtt
+from app.segment_by_gap import segment_funasr_result
+from app.subtitle import (
+    enrich_segments,
+    punctuate_segments,
+    render_punctuated_text,
+    render_segments_text,
+    render_srt,
+    render_vtt,
+)
 
 
 def safe_stem(filename: str) -> str:
@@ -67,16 +74,18 @@ class AudioTranscriber:
         resolved_threshold = threshold_ms or self.config.asr.gap_threshold_ms
         segmented = segment_funasr_result(raw_result, resolved_threshold)
         segments_json_path.write_text(json.dumps(segmented, ensure_ascii=False, indent=2), encoding="utf-8")
-        segments_text = render_segments_text(segmented)
-        segments_txt_path.write_text(segments_text + ("\n" if segments_text else ""), encoding="utf-8")
         flat_segments = [segment for item in segmented for segment in item.get("segments", [])]
         enriched_segments = enrich_segments(flat_segments)
-        srt_text = render_srt(enriched_segments)
-        vtt_text = render_vtt(enriched_segments)
+        punctuated_segments = punctuate_segments(enriched_segments)
+        segments_text = render_segments_text(punctuated_segments)
+        segments_txt_path.write_text(segments_text + ("\n" if segments_text else ""), encoding="utf-8")
+        srt_text = render_srt(punctuated_segments)
+        vtt_text = render_vtt(punctuated_segments)
         srt_path.write_text(srt_text + ("\n" if srt_text else ""), encoding="utf-8")
         vtt_path.write_text(vtt_text + ("\n" if vtt_text else ""), encoding="utf-8")
 
-        text = "".join(item.get("text", "").replace(" ", "") for item in raw_result)
+        plain_text = "".join(item.get("text", "").replace(" ", "") for item in raw_result)
+        text = render_punctuated_text(punctuated_segments)
         result = {
             "taskId": task_id,
             "status": "success",
@@ -87,7 +96,8 @@ class AudioTranscriber:
                 "durationMs": probe_duration_ms(source_path),
             },
             "text": text,
-            "segments": enriched_segments,
+            "plainText": plain_text,
+            "segments": punctuated_segments,
             "files": {
                 "wav": str(converted_wav),
                 "rawJson": str(json_path),

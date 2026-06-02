@@ -205,10 +205,22 @@ find /opt -name docker-compose.yml
 
 ### 3. 构建并启动服务
 
-Docker 镜像构建时默认使用阿里云 Debian 镜像源，适合中国国内服务器。
+Docker 镜像构建时默认使用阿里云 Debian 源和阿里云 PyPI 源，适合中国国内服务器。
 
 ```bash
 docker compose up -d --build
+```
+
+也可以使用项目脚本启动：
+
+```bash
+bash scripts/docker_start.sh
+```
+
+停止服务：
+
+```bash
+bash scripts/docker_stop.sh
 ```
 
 旧版 Docker 可使用：
