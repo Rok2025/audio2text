@@ -27,6 +27,7 @@
 - 调用记录写入 `storage/records/records.jsonl`。
 - 异步任务状态写入 `storage/jobs/{taskId}.json`。
 - 运行产物已加入 `.gitignore`。
+- 新增国内服务器 Docker 配置：`Dockerfile.cn`、`docker-compose.cn.yml`、`scripts/docker_start_cn.sh`、`scripts/docker_stop_cn.sh`。
 
 ### 文档
 

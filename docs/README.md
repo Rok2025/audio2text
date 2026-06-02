@@ -7,6 +7,7 @@
 ## 服务管理
 
 - [SERVICE_MANAGEMENT_PLAN.md](SERVICE_MANAGEMENT_PLAN.md)：服务日志、调用记录、运行目录和第一版管理范围。
+- [UPLOAD_DEPLOYMENT.md](UPLOAD_DEPLOYMENT.md)：通过本地打包上传的方式部署到服务器。
 
 ## 变更说明
 
@@ -18,6 +19,18 @@
 
 ```bash
 bash scripts/run_server.sh
+```
+
+Docker 启动：
+
+```bash
+bash scripts/docker_start.sh
+```
+
+国内 Linux 服务器 Docker 启动：
+
+```bash
+bash scripts/docker_start_cn.sh
 ```
 
 检查服务：

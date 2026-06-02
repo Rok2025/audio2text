@@ -114,6 +114,8 @@ curl -F "file=@/path/to/video.mp4" "http://127.0.0.1:8000/api/transcribe?thresho
 
 文档索引见：[docs/README.md](docs/README.md)。
 
+上传部署到服务器见：[docs/UPLOAD_DEPLOYMENT.md](docs/UPLOAD_DEPLOYMENT.md)。
+
 当前 HTTP 接口能力：
 
 - 支持音频：`.aac`、`.flac`、`.m4a`、`.mp3`、`.ogg`、`.opus`、`.wav`
@@ -205,28 +207,42 @@ find /opt -name docker-compose.yml
 
 ### 3. 构建并启动服务
 
-Docker 镜像构建时默认使用阿里云 Debian 源和阿里云 PyPI 源，适合中国国内服务器。
+默认配置使用基础镜像自带 Debian 源和默认 PyPI 源，适合 macOS 本地或网络通畅环境。
 
 ```bash
 docker compose up -d --build
 ```
 
-也可以使用项目脚本启动：
+也可以使用项目脚本启动默认配置：
 
 ```bash
 bash scripts/docker_start.sh
 ```
 
-停止服务：
+停止默认配置服务：
 
 ```bash
 bash scripts/docker_stop.sh
+```
+
+中国国内 Linux 服务器建议使用国内源配置，默认启用阿里云 Debian 源和阿里云 PyPI 源：
+
+```bash
+docker compose -f docker-compose.cn.yml up -d --build
+```
+
+对应脚本：
+
+```bash
+bash scripts/docker_start_cn.sh
+bash scripts/docker_stop_cn.sh
 ```
 
 旧版 Docker 可使用：
 
 ```bash
 docker-compose up -d --build
+docker-compose -f docker-compose.cn.yml up -d --build
 ```
 
 ### 4. 检查服务
